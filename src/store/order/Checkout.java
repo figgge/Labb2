@@ -25,12 +25,16 @@ public class Checkout {
         if (!shoppingCart.contains(getProduct(articleNumber, shoppingCart)) && product.getQuantity() > 0)
             shoppingCart.add(Product.createNewProduct(product));
         if (product.getQuantity() > 0) {
-            Product productInCart = getProduct(articleNumber, shoppingCart);
-            productInCart.addOne();
-            product.removeOne();
-            System.out.println("1 st " + product.toStringReducedNoQuantity() + " är tillagd i varukorgen\n");
+            moveProductFromStockToShoppingCart(product, articleNumber);
         } else if (product.getQuantity() < 1)
             System.out.println("Artikeln är slutsåld.\n");
+    }
+
+    private static void moveProductFromStockToShoppingCart(Product product, int articleNumber) {
+        Product productInCart = getProduct(articleNumber, shoppingCart);
+        productInCart.addOne();
+        product.removeOne();
+        System.out.println("1 st " + product.toStringReducedNoQuantity() + " är tillagd i varukorgen\n");
     }
 
     public static void removeProductFromShoppingCart(Scanner scanner, List<Product> shoppingCart) {
@@ -38,14 +42,17 @@ public class Checkout {
         String message = "1 st " + product.toStringReducedNoQuantity() + " är borttagen ur varukorgen.\n";
         if (product.getQuantity() > 1) {
             getProduct(product.getArticleNumber(), shoppingCart).removeOne();
-            getProduct(product.getArticleNumber(), Product.getAllProducts()).addOne();
-            System.out.println(message);
+            moveProductFromShoppingCartToStock(product, message);
         } else if (product.getQuantity() > 0) {
             shoppingCart.remove(product);
-            getProduct(product.getArticleNumber(), Product.getAllProducts()).addOne();
-            System.out.println(message);
+            moveProductFromShoppingCartToStock(product, message);
         } else
             System.out.println("Artikeln finns inte i varukorgen.\n");
+    }
+
+    private static void moveProductFromShoppingCartToStock(Product product, String message) {
+        getProduct(product.getArticleNumber(), Product.getAllProducts()).addOne();
+        System.out.println(message);
     }
 
     public static BigDecimal sumOfProducts() {
